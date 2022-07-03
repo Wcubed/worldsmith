@@ -1,9 +1,11 @@
 [package]
-name = "Worldsmith"
+name = "worldsmith"
 version = "0.1.0"
 edition = "2021"
 
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
-
 [dependencies]
+worldsmith_lib = { path = "worldsmith_lib" }
+
 eframe = "0.18.0"
+
+[workspace]

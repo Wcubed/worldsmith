@@ -3,13 +3,6 @@
 version = 3
 
 [[package]]
-name = "Worldsmith"
-version = "0.1.0"
-dependencies = [
- "eframe",
-]
-
-[[package]]
 name = "ab_glyph"
 version = "0.2.15"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1590,6 +1583,18 @@ dependencies = [
  "winapi",
  "x11-dl",
 ]
+
+[[package]]
+name = "worldsmith"
+version = "0.1.0"
+dependencies = [
+ "eframe",
+ "worldsmith_lib",
+]
+
+[[package]]
+name = "worldsmith_lib"
+version = "0.1.0"
 
 [[package]]
 name = "x11-dl"

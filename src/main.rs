@@ -4,6 +4,7 @@
 use crate::egui::{Ui, Visuals};
 use eframe::egui::Context;
 use eframe::{egui, Frame};
+use worldsmith_lib::MainSequenceStar;
 
 fn main() {
     let native_options = eframe::NativeOptions::default();
@@ -14,12 +15,14 @@ fn main() {
     );
 }
 
-struct WorldSmith;
+struct WorldSmith {
+    solar_mass: f32,
+}
 
 impl WorldSmith {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
         cc.egui_ctx.set_visuals(Visuals::dark());
-        WorldSmith
+        WorldSmith { solar_mass: 1.0 }
     }
 }
 
@@ -33,7 +36,35 @@ impl eframe::App for WorldSmith {
         });
 
         egui::CentralPanel::default().show(ctx, |ui| {
-            ui.heading("Hello World!");
+            ui.heading("Star calculator");
+
+            let main_sequence_mass_range = 0.075..=100.0;
+
+            ui.add(
+                egui::Slider::new(&mut self.solar_mass, main_sequence_mass_range)
+                    .logarithmic(true)
+                    .text("M☉ (Solar masses)"),
+            );
+
+            // TODO (Wybe 2022-07-03): Cache this?
+            let star = MainSequenceStar::calculate_parameters(self.solar_mass, 0.0);
+
+            egui::Grid::new("main_sequence_parameters")
+                .num_columns(2)
+                .striped(true)
+                .show(ui, |ui| {
+                    ui.label(format!("{:.5}", star.solar_radius));
+                    ui.label("R☉ (Solar radii)");
+                    ui.end_row();
+
+                    ui.label(if star.solar_luminosity < 1000. {
+                        format!("{:.5}", star.solar_luminosity)
+                    } else {
+                        format!("{:.0}", star.solar_luminosity)
+                    });
+                    ui.label("L☉ (Solar radii)");
+                    ui.end_row();
+                });
         });
     }
 }
