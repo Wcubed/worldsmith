@@ -40,29 +40,38 @@ impl eframe::App for WorldSmith {
 
             let main_sequence_mass_range = 0.075..=100.0;
 
-            ui.add(
-                egui::Slider::new(&mut self.solar_mass, main_sequence_mass_range)
-                    .logarithmic(true)
-                    .text("M☉ (Solar masses)"),
-            );
-
-            // TODO (Wybe 2022-07-03): Cache this?
-            let star = MainSequenceStar::calculate_parameters(self.solar_mass, 0.0);
-
             egui::Grid::new("main_sequence_parameters")
-                .num_columns(2)
+                .num_columns(3)
                 .striped(true)
                 .show(ui, |ui| {
-                    ui.label(format!("{:.5}", star.solar_radius));
-                    ui.label("R☉ (Solar radii)");
+                    ui.label("Mass");
+                    ui.add(
+                        egui::Slider::new(&mut self.solar_mass, main_sequence_mass_range)
+                            .logarithmic(true),
+                    );
+                    ui.label("M☉").on_hover_text("Solar masses");
                     ui.end_row();
 
+                    // TODO (Wybe 2022-07-03): Cache this?
+                    let star = MainSequenceStar::calculate_parameters(self.solar_mass, 0.0);
+
+                    ui.label("Radius");
+                    ui.label(format!("{:.3}", star.solar_radius));
+                    ui.label("R☉").on_hover_text("Solar radii");
+                    ui.end_row();
+
+                    ui.label("Luminosity");
                     ui.label(if star.solar_luminosity < 1000. {
-                        format!("{:.5}", star.solar_luminosity)
+                        format!("{:.3}", star.solar_luminosity)
                     } else {
                         format!("{:.0}", star.solar_luminosity)
                     });
-                    ui.label("L☉ (Solar radii)");
+                    ui.label("L☉").on_hover_text("Solar luminosities");
+                    ui.end_row();
+
+                    ui.label("Density");
+                    ui.label(format!("{:.3}", star.solar_density));
+                    ui.label("D☉").on_hover_text("Solar density");
                     ui.end_row();
                 });
         });

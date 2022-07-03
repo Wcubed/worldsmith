@@ -8,7 +8,7 @@ pub struct MainSequenceStar {
     //max_age: f32,
     pub solar_radius: f32,
     pub solar_luminosity: f32,
-    //solar_density: f32,
+    pub solar_density: f32,
     //temperature: f32,
 }
 
@@ -17,11 +17,13 @@ impl MainSequenceStar {
     pub fn calculate_parameters(solar_mass: f32, age: f32) -> MainSequenceStar {
         let solar_radius = Self::calculate_solar_radius(solar_mass);
         let solar_luminosity = Self::calculate_solar_luminosity(solar_mass);
+        let solar_density = Self::calculate_solar_density(solar_mass, solar_radius);
 
         MainSequenceStar {
             solar_mass,
             solar_radius,
             solar_luminosity,
+            solar_density,
         }
     }
 
@@ -46,6 +48,10 @@ impl MainSequenceStar {
         } else {
             solar_mass.powf(3.5) * 1.4
         }
+    }
+
+    fn calculate_solar_density(solar_mass: f32, solar_radius: f32) -> f32 {
+        solar_mass / solar_radius.powi(3)
     }
 }
 
