@@ -38,7 +38,8 @@ impl eframe::App for WorldSmith {
         egui::CentralPanel::default().show(ctx, |ui| {
             ui.heading("Star calculator");
 
-            let main_sequence_mass_range = 0.075..=100.0;
+            // TODO (Wybe 2022-07-03): Encode this in the MainSequenceStar struct?
+            let main_sequence_mass_range = 0.075..=94.0;
 
             egui::Grid::new("main_sequence_parameters")
                 .num_columns(3)
@@ -55,14 +56,27 @@ impl eframe::App for WorldSmith {
                     // TODO (Wybe 2022-07-03): Cache this?
                     let star = MainSequenceStar::calculate_parameters(self.solar_mass, 0.0);
 
+                    ui.label("Stellar class");
+                    ui.label(format!("{}", star.class));
+                    // TODO (Wybe 2022-07-03): Add explanation of stellar class here.
+                    ui.end_row();
+
+                    // TODO (Wybe 2022-07-03): Allow copying by clicking a value (and change cursor to indicate you can click).
+                    // TODO (Wybe 2022-07-03): Add a button to copy everything into the clipboard.
+                    ui.label("Maximum age");
+                    ui.label(format!("{:.5}", star.max_age_gigayears));
+                    ui.label("Gyr")
+                        .on_hover_text("Giga earth years. 1 billion years (1,000,000,000)");
+                    ui.end_row();
+
                     ui.label("Radius");
-                    ui.label(format!("{:.3}", star.solar_radius));
+                    ui.label(format!("{:.5}", star.solar_radius));
                     ui.label("R☉").on_hover_text("Solar radii");
                     ui.end_row();
 
                     ui.label("Luminosity");
                     ui.label(if star.solar_luminosity < 1000. {
-                        format!("{:.3}", star.solar_luminosity)
+                        format!("{:.5}", star.solar_luminosity)
                     } else {
                         format!("{:.0}", star.solar_luminosity)
                     });
@@ -70,8 +84,13 @@ impl eframe::App for WorldSmith {
                     ui.end_row();
 
                     ui.label("Density");
-                    ui.label(format!("{:.3}", star.solar_density));
+                    ui.label(format!("{:.5}", star.solar_density));
                     ui.label("D☉").on_hover_text("Solar density");
+                    ui.end_row();
+
+                    ui.label("Temperature");
+                    ui.label(format!("{:.0}", star.temperature));
+                    ui.label("K").on_hover_text("Kelvin");
                     ui.end_row();
                 });
         });
