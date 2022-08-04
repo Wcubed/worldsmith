@@ -1,7 +1,10 @@
 #![deny(unsafe_code)]
 #![warn(rust_2018_idioms)]
 
+mod widgets;
+
 use crate::egui::{Ui, Visuals};
+use crate::widgets::label_with_copy;
 use eframe::egui::Context;
 use eframe::{egui, Frame};
 use worldsmith_lib::units::{Kelvin, SolarDensity, SolarLuminosity, SolarMass, SolarRadius, Unit};
@@ -61,42 +64,45 @@ impl eframe::App for WorldSmith {
                     );
 
                     ui.label("Stellar class");
-                    ui.label(format!("{}", star.class));
+                    label_with_copy(ui, format!("{}", star.class));
                     // TODO (Wybe 2022-07-03): Add explanation of stellar class here.
                     ui.end_row();
 
                     // TODO (Wybe 2022-07-03): Allow copying by clicking a value (and change cursor to indicate you can click).
                     // TODO (Wybe 2022-07-03): Add a button to copy everything into the clipboard.
                     ui.label("Maximum age");
-                    ui.label(format!("{:.5}", star.max_age_gigayears));
+                    label_with_copy(ui, format!("{:.5}", star.max_age_gigayears));
                     ui.label("Gyr")
                         .on_hover_text("Giga earth years. 1 billion years (1,000,000,000)");
                     ui.end_row();
 
                     ui.label("Radius");
-                    ui.label(format!("{:.5}", star.radius));
+                    label_with_copy(ui, format!("{:.5}", star.radius));
                     ui.label(SolarRadius::SYMBOL)
                         .on_hover_text(SolarRadius::NAME);
                     ui.end_row();
 
                     ui.label("Luminosity");
-                    ui.label(if star.luminosity < SolarLuminosity::new(1000.) {
-                        format!("{:.5}", star.luminosity)
-                    } else {
-                        format!("{:.0}", star.luminosity)
-                    });
+                    label_with_copy(
+                        ui,
+                        &if star.luminosity < SolarLuminosity::new(1000.) {
+                            format!("{:.5}", star.luminosity)
+                        } else {
+                            format!("{:.0}", star.luminosity)
+                        },
+                    );
                     ui.label(SolarLuminosity::SYMBOL)
                         .on_hover_text(SolarLuminosity::NAME);
                     ui.end_row();
 
                     ui.label("Density");
-                    ui.label(format!("{:.5}", star.density));
+                    label_with_copy(ui, format!("{:.5}", star.density));
                     ui.label(SolarDensity::SYMBOL)
                         .on_hover_text(SolarDensity::NAME);
                     ui.end_row();
 
                     ui.label("Temperature");
-                    ui.label(format!("{:.0}", star.temperature));
+                    label_with_copy(ui, format!("{:.0}", star.temperature));
                     ui.label(Kelvin::SYMBOL).on_hover_text(Kelvin::NAME);
                     ui.end_row();
                 });
