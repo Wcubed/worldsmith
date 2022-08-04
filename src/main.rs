@@ -4,6 +4,7 @@
 use crate::egui::{Ui, Visuals};
 use eframe::egui::Context;
 use eframe::{egui, Frame};
+use worldsmith_lib::units::{Kelvin, SolarDensity, SolarLuminosity, SolarMass, SolarRadius, Unit};
 use worldsmith_lib::MainSequenceStar;
 
 fn main() {
@@ -50,11 +51,14 @@ impl eframe::App for WorldSmith {
                         egui::Slider::new(&mut self.solar_mass, main_sequence_mass_range)
                             .logarithmic(true),
                     );
-                    ui.label("M☉").on_hover_text("Solar masses");
+                    ui.label(SolarMass::SYMBOL).on_hover_text(SolarMass::NAME);
                     ui.end_row();
 
                     // TODO (Wybe 2022-07-03): Cache this?
-                    let star = MainSequenceStar::calculate_parameters(self.solar_mass, 0.0);
+                    let star = MainSequenceStar::calculate_parameters(
+                        SolarMass::new(self.solar_mass),
+                        0.0,
+                    );
 
                     ui.label("Stellar class");
                     ui.label(format!("{}", star.class));
@@ -70,27 +74,30 @@ impl eframe::App for WorldSmith {
                     ui.end_row();
 
                     ui.label("Radius");
-                    ui.label(format!("{:.5}", star.solar_radius));
-                    ui.label("R☉").on_hover_text("Solar radii");
+                    ui.label(format!("{:.5}", star.radius));
+                    ui.label(SolarRadius::SYMBOL)
+                        .on_hover_text(SolarRadius::NAME);
                     ui.end_row();
 
                     ui.label("Luminosity");
-                    ui.label(if star.solar_luminosity < 1000. {
-                        format!("{:.5}", star.solar_luminosity)
+                    ui.label(if star.luminosity < SolarLuminosity::new(1000.) {
+                        format!("{:.5}", star.luminosity)
                     } else {
-                        format!("{:.0}", star.solar_luminosity)
+                        format!("{:.0}", star.luminosity)
                     });
-                    ui.label("L☉").on_hover_text("Solar luminosities");
+                    ui.label(SolarLuminosity::SYMBOL)
+                        .on_hover_text(SolarLuminosity::NAME);
                     ui.end_row();
 
                     ui.label("Density");
-                    ui.label(format!("{:.5}", star.solar_density));
-                    ui.label("D☉").on_hover_text("Solar density");
+                    ui.label(format!("{:.5}", star.density));
+                    ui.label(SolarDensity::SYMBOL)
+                        .on_hover_text(SolarDensity::NAME);
                     ui.end_row();
 
                     ui.label("Temperature");
                     ui.label(format!("{:.0}", star.temperature));
-                    ui.label("K").on_hover_text("Kelvin");
+                    ui.label(Kelvin::SYMBOL).on_hover_text(Kelvin::NAME);
                     ui.end_row();
                 });
         });
