@@ -20,13 +20,21 @@ fn main() {
 }
 
 struct WorldSmith {
-    solar_mass: f32,
+    input_solar_mass: f32,
+    star: MainSequenceStar,
 }
 
 impl WorldSmith {
     fn new(cc: &eframe::CreationContext<'_>) -> Self {
         cc.egui_ctx.set_visuals(Visuals::dark());
-        WorldSmith { solar_mass: 1.0 }
+
+        let input_solar_mass = 1.0;
+        let star = MainSequenceStar::calculate_parameters(input_solar_mass.into(), 0.0);
+
+        WorldSmith {
+            input_solar_mass: 1.0,
+            star,
+        }
     }
 }
 
@@ -45,19 +53,32 @@ impl eframe::App for WorldSmith {
             // TODO (Wybe 2022-07-03): Encode this in the MainSequenceStar struct?
             let main_sequence_mass_range = 0.075..=94.0;
 
-            // TODO (Wybe 2022-07-03): Cache this?
-            let star = MainSequenceStar::calculate_parameters(SolarMass::new(self.solar_mass), 0.0);
-            let color = Color32::from_rgb(star.color.r(), star.color.g(), star.color.b());
+            let color = Color32::from_rgb(
+                self.star.color.r(),
+                self.star.color.g(),
+                self.star.color.b(),
+            );
 
             egui::Grid::new("main_sequence_parameters")
                 .num_columns(3)
                 .striped(true)
                 .show(ui, |ui| {
                     ui.label("Mass");
+
+                    let previous_mass = self.input_solar_mass;
                     ui.add(
-                        egui::Slider::new(&mut self.solar_mass, main_sequence_mass_range)
+                        egui::Slider::new(&mut self.input_solar_mass, main_sequence_mass_range)
                             .logarithmic(true),
                     );
+                    if self.input_solar_mass != previous_mass {
+                        self.star = MainSequenceStar::calculate_parameters(
+                            self.input_solar_mass.into(),
+                            0.0,
+                        );
+                    }
+
+                    let star = &self.star;
+
                     ui.label(SolarMass::SYMBOL).on_hover_text(SolarMass::NAME);
                     ui.end_row();
 
@@ -109,7 +130,7 @@ impl eframe::App for WorldSmith {
                     color_click_to_copy(ui, color);
                 });
 
-            star_size_comparison_chart(ui, star.radius);
+            star_size_comparison_chart(ui, self.star.radius);
 
             // todo: add a habitable zone comparison chart,
             //       showing where the orbits of the planets in the solar system are relative to

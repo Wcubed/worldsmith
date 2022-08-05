@@ -7,7 +7,7 @@ pub trait Unit {
 }
 
 /// M☉ = 1.98847 * 10^30 kg
-#[derive(Copy, Clone, Display)]
+#[derive(Copy, Clone, Display, From, Into)]
 pub struct SolarMass(f32);
 
 impl SolarMass {
