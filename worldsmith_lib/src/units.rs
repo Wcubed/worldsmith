@@ -134,6 +134,26 @@ impl Unit for Kelvin {
     const NAME: &'static str = "kelvin";
 }
 
+pub struct ColorRgb(u8, u8, u8);
+
+impl ColorRgb {
+    pub fn new(r: u8, g: u8, b: u8) -> Self {
+        ColorRgb(r, g, b)
+    }
+
+    pub fn r(&self) -> u8 {
+        self.0
+    }
+
+    pub fn g(&self) -> u8 {
+        self.1
+    }
+
+    pub fn b(&self) -> u8 {
+        self.2
+    }
+}
+
 /// TODO (Wybe 2022-07-03): Make the magic numbers no longer magic.
 pub fn calculate_maximum_age_gigayears(mass: SolarMass, luminosity: SolarLuminosity) -> f32 {
     (mass.0 / luminosity.0) * 10.

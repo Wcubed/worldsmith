@@ -14,6 +14,8 @@ pub struct MainSequenceStar {
     pub luminosity: SolarLuminosity,
     pub density: SolarDensity,
     pub temperature: Kelvin,
+    // TODO: mention what this color means exactly. Because it is not truly what the eye would see.
+    pub color: ColorRgb,
 }
 
 impl MainSequenceStar {
@@ -36,6 +38,8 @@ impl MainSequenceStar {
             density,
             max_age_gigayears: maximum_age,
             temperature,
+            // todo: calculate the color of the star.
+            color: ColorRgb::new(100, 200, 255),
         }
     }
 }

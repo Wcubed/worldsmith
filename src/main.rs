@@ -3,9 +3,11 @@
 
 mod widgets;
 
-use crate::egui::{Ui, Visuals};
-use crate::widgets::label_with_copy;
-use eframe::egui::Context;
+use crate::egui::plot::Plot;
+use crate::egui::Color32;
+use crate::widgets::{color_click_to_copy, label_click_to_copy};
+use eframe::egui::{Button, Context, CursorIcon, Pos2, Sense, Stroke, Ui, Vec2, Visuals, Widget};
+use eframe::epaint::CircleShape;
 use eframe::{egui, Frame};
 use worldsmith_lib::units::{Kelvin, SolarDensity, SolarLuminosity, SolarMass, SolarRadius, Unit};
 use worldsmith_lib::MainSequenceStar;
@@ -45,6 +47,10 @@ impl eframe::App for WorldSmith {
             // TODO (Wybe 2022-07-03): Encode this in the MainSequenceStar struct?
             let main_sequence_mass_range = 0.075..=94.0;
 
+            // TODO (Wybe 2022-07-03): Cache this?
+            let star = MainSequenceStar::calculate_parameters(SolarMass::new(self.solar_mass), 0.0);
+            let color = Color32::from_rgb(star.color.r(), star.color.g(), star.color.b());
+
             egui::Grid::new("main_sequence_parameters")
                 .num_columns(3)
                 .striped(true)
@@ -57,33 +63,27 @@ impl eframe::App for WorldSmith {
                     ui.label(SolarMass::SYMBOL).on_hover_text(SolarMass::NAME);
                     ui.end_row();
 
-                    // TODO (Wybe 2022-07-03): Cache this?
-                    let star = MainSequenceStar::calculate_parameters(
-                        SolarMass::new(self.solar_mass),
-                        0.0,
-                    );
-
                     ui.label("Stellar class");
-                    label_with_copy(ui, format!("{}", star.class));
+                    label_click_to_copy(ui, format!("{}", star.class));
                     // TODO (Wybe 2022-07-03): Add explanation of stellar class here.
                     ui.end_row();
 
                     // TODO (Wybe 2022-07-03): Allow copying by clicking a value (and change cursor to indicate you can click).
                     // TODO (Wybe 2022-07-03): Add a button to copy everything into the clipboard.
                     ui.label("Maximum age");
-                    label_with_copy(ui, format!("{:.5}", star.max_age_gigayears));
+                    label_click_to_copy(ui, format!("{:.5}", star.max_age_gigayears));
                     ui.label("Gyr")
                         .on_hover_text("Giga earth years. 1 billion years (1,000,000,000)");
                     ui.end_row();
 
                     ui.label("Radius");
-                    label_with_copy(ui, format!("{:.5}", star.radius));
+                    label_click_to_copy(ui, format!("{:.5}", star.radius));
                     ui.label(SolarRadius::SYMBOL)
                         .on_hover_text(SolarRadius::NAME);
                     ui.end_row();
 
                     ui.label("Luminosity");
-                    label_with_copy(
+                    label_click_to_copy(
                         ui,
                         &if star.luminosity < SolarLuminosity::new(1000.) {
                             format!("{:.5}", star.luminosity)
@@ -96,15 +96,19 @@ impl eframe::App for WorldSmith {
                     ui.end_row();
 
                     ui.label("Density");
-                    label_with_copy(ui, format!("{:.5}", star.density));
+                    label_click_to_copy(ui, format!("{:.5}", star.density));
                     ui.label(SolarDensity::SYMBOL)
                         .on_hover_text(SolarDensity::NAME);
                     ui.end_row();
 
                     ui.label("Temperature");
-                    label_with_copy(ui, format!("{:.0}", star.temperature));
+                    label_click_to_copy(ui, format!("{:.0}", star.temperature));
                     ui.label(Kelvin::SYMBOL).on_hover_text(Kelvin::NAME);
                     ui.end_row();
+
+                    // TODO WYBE: Add info on exactly what this color means.
+                    ui.label("Color");
+                    color_click_to_copy(ui, color);
                 });
         });
     }
