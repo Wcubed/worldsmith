@@ -103,7 +103,7 @@ fn draw_relative_orbit_size(
         center + Vec2::new(circle_radius, 0.),
         Align2::RIGHT_CENTER,
         format!("{}\n{:.1}", name, radius),
-        FontId::new(10., FontFamily::Proportional),
+        FontId::new(15., FontFamily::Proportional),
         style.text_color(),
     );
 }

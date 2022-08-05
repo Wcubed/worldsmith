@@ -21,6 +21,7 @@ fn main() {
 
 struct WorldSmith {
     input_solar_mass: f32,
+    input_age_gigayears: f32,
     star: MainSequenceStar,
 }
 
@@ -29,10 +30,13 @@ impl WorldSmith {
         cc.egui_ctx.set_visuals(Visuals::dark());
 
         let input_solar_mass = 1.0;
-        let star = MainSequenceStar::calculate_parameters(input_solar_mass.into(), 0.0);
+        let input_age_gigayears = 100.0;
+        let star =
+            MainSequenceStar::calculate_parameters(input_solar_mass.into(), input_age_gigayears);
 
         WorldSmith {
-            input_solar_mass: 1.0,
+            input_solar_mass,
+            input_age_gigayears,
             star,
         }
     }
@@ -52,6 +56,8 @@ impl eframe::App for WorldSmith {
 
             // TODO (Wybe 2022-07-03): Encode this in the MainSequenceStar struct?
             let main_sequence_mass_range = 0.075..=94.0;
+            // TODO: How large should this range be?
+            let main_sequence_age_range = 10.0..=1000.0;
 
             let color = Color32::from_rgb(
                 self.star.color.r(),
@@ -63,24 +69,36 @@ impl eframe::App for WorldSmith {
                 .num_columns(3)
                 .striped(true)
                 .show(ui, |ui| {
-                    ui.label("Mass");
-
                     let previous_mass = self.input_solar_mass;
+                    let previous_age = self.input_age_gigayears;
+
+                    ui.label("Mass");
                     ui.add(
                         egui::Slider::new(&mut self.input_solar_mass, main_sequence_mass_range)
                             .logarithmic(true),
                     );
-                    if self.input_solar_mass != previous_mass {
+                    ui.label(SolarMass::SYMBOL).on_hover_text(SolarMass::NAME);
+                    ui.end_row();
+
+                    ui.label("Age");
+                    ui.add(
+                        egui::Slider::new(&mut self.input_age_gigayears, main_sequence_age_range)
+                            .logarithmic(true),
+                    );
+                    ui.label("Gy")
+                        .on_hover_text("Giga years (1.000.000.000 years)");
+                    ui.end_row();
+
+                    if self.input_solar_mass != previous_mass
+                        || self.input_age_gigayears != previous_age
+                    {
                         self.star = MainSequenceStar::calculate_parameters(
                             self.input_solar_mass.into(),
-                            0.0,
+                            self.input_age_gigayears,
                         );
                     }
 
                     let star = &self.star;
-
-                    ui.label(SolarMass::SYMBOL).on_hover_text(SolarMass::NAME);
-                    ui.end_row();
 
                     ui.label("Stellar class");
                     label_click_to_copy(ui, format!("{}", star.class));
