@@ -90,7 +90,7 @@ impl Unit for SolarDensity {
     const NAME: &'static str = "solar density";
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum SpectralClass {
     O,
     A,
@@ -134,6 +134,7 @@ impl Unit for Kelvin {
     const NAME: &'static str = "kelvin";
 }
 
+#[derive(Clone)]
 pub struct ColorRgb(u8, u8, u8);
 
 impl ColorRgb {

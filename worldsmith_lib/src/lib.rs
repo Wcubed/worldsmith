@@ -5,6 +5,7 @@ use std::fmt::{Display, Formatter};
 
 /// Call [calculate_parameters] to get the values of a semi realistic star.
 /// TODO (Wybe 2022-07-03): Change the f32 into new unit types, so that unit conversions are always correct.
+#[derive(Clone)]
 pub struct MainSequenceStar {
     pub class: MainSequenceStellarClass,
     pub mass: SolarMass,
@@ -44,6 +45,7 @@ impl MainSequenceStar {
     }
 }
 
+#[derive(Clone)]
 pub struct MainSequenceStellarClass {
     pub spectral_class: SpectralClass,
     /// Extra subdivision of spectral class.
