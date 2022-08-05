@@ -1,9 +1,8 @@
-use eframe::egui::style::WidgetVisuals;
 use eframe::egui::{
     Align2, Button, Color32, CursorIcon, FontFamily, FontId, Painter, Pos2, Sense, Ui, Vec2,
     Widget, WidgetText,
 };
-use worldsmith_lib::units::SolarRadius;
+use worldsmith_lib::units::{SolarRadius, Unit};
 
 pub fn label_click_to_copy(ui: &mut Ui, text: impl Into<WidgetText>) {
     let text = text.into();
@@ -36,7 +35,7 @@ pub fn color_click_to_copy(ui: &mut Ui, color: impl Into<Color32>) {
 pub fn star_size_comparison_chart(ui: &mut Ui, radius: SolarRadius) {
     let widget_size = Vec2::new(400.0, 100.0);
 
-    let (response, painter) = ui.allocate_painter(widget_size, Sense::focusable_noninteractive());
+    let (response, painter) = ui.allocate_painter(widget_size, Sense::hover());
     let rect = response.rect;
 
     if ui.is_rect_visible(rect) {
@@ -60,50 +59,68 @@ pub fn star_size_comparison_chart(ui: &mut Ui, radius: SolarRadius) {
             visuals.text_color(),
         );
 
-        // Show the subject star.
-        draw_relative_orbit_size(&painter, visuals, rect.center(), radius, "This", radius);
+        let subject_star_pixel_radius = 20.0;
 
-        // TODO: Add actual orbits / star sizes to this.
+        // Show the subject star.
+        let mut subject_star_background = visuals.fg_stroke.color;
+        subject_star_background = subject_star_background.linear_multiply(0.2);
+
+        painter.circle(
+            rect.center(),
+            subject_star_pixel_radius,
+            subject_star_background,
+            visuals.fg_stroke,
+        );
+        // TODO wybe 08-05-2022: Check how to properly do the picking of the font.
+        painter.text(
+            rect.center() + Vec2::new(0., subject_star_pixel_radius),
+            Align2::CENTER_TOP,
+            format!("{:.1}", radius),
+            FontId::new(15., FontFamily::Proportional),
+            visuals.text_color(),
+        );
+
         let comparison_radii: Vec<(SolarRadius, &'static str)> = vec![
+            (0.18.into(), "EZ Aquarii A"),
             (1.0.into(), "Sun"),
-            (4.0.into(), "Orbit 2"),
-            (10.0.into(), "Orbit 6"),
+            (3.8.into(), "Pi\nAndromedae A"),
+            (9.8.into(), "Theta Orionis C"),
         ];
 
-        for (orbit_radius, name) in comparison_radii {
-            draw_relative_orbit_size(&painter, visuals, rect.center(), orbit_radius, name, radius)
+        for (comparison_radius, name) in comparison_radii {
+            let draw_radius =
+                calculate_draw_radius(comparison_radius, radius, subject_star_pixel_radius);
+
+            painter.circle(
+                rect.center(),
+                draw_radius,
+                Color32::TRANSPARENT,
+                visuals.fg_stroke,
+            );
+
+            if draw_radius >= subject_star_pixel_radius {
+                // TODO wybe 08-05-2022: Check how to properly do the picking of the font.
+                // TODO: When to draw the text so that it doesn't overlap each other?
+                painter.text(
+                    rect.center() + Vec2::new(draw_radius, 0.),
+                    Align2::LEFT_CENTER,
+                    format!("{}\n{:.1} {}", name, comparison_radius, SolarRadius::SYMBOL),
+                    FontId::new(15., FontFamily::Proportional),
+                    visuals.text_color(),
+                );
+            }
         }
     }
 }
 
-/// Draws a circle at the `center`.
-/// The circle will have an on-screen radius relative to `comparison_radius`.
-/// TODO: Somehow layout the text so that it doesn't overlap / hides when necessary?
-fn draw_relative_orbit_size(
-    painter: &Painter,
-    style: &WidgetVisuals,
-    center: Pos2,
+/// Calculates the radius in pixels of a given orbit, relative to the reference radius.
+fn calculate_draw_radius(
     radius: SolarRadius,
-    name: &str,
-    comparison_radius: SolarRadius,
-) {
-    /// The comparison star is always this large.
-    const PIXELS_PER_COMPARISON_STAR_RADIUS: f32 = 20.0;
-
+    reference_radius: SolarRadius,
+    reference_radius_pixels: f32,
+) -> f32 {
     let radius: f32 = radius.into();
-    let comparison_radius: f32 = comparison_radius.into();
+    let reference_radius: f32 = reference_radius.into();
 
-    let relative_radius = radius / comparison_radius;
-    let circle_radius = relative_radius * PIXELS_PER_COMPARISON_STAR_RADIUS;
-
-    painter.circle(center, circle_radius, Color32::TRANSPARENT, style.fg_stroke);
-
-    // TODO wybe 08-05-2022: Check how to properly do the picking of the font.
-    painter.text(
-        center + Vec2::new(circle_radius, 0.),
-        Align2::RIGHT_CENTER,
-        format!("{}\n{:.1}", name, radius),
-        FontId::new(15., FontFamily::Proportional),
-        style.text_color(),
-    );
+    (radius / reference_radius) * reference_radius_pixels
 }
