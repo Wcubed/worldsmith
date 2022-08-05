@@ -80,13 +80,16 @@ pub fn star_size_comparison_chart(ui: &mut Ui, radius: SolarRadius) {
             visuals.text_color(),
         );
 
+        // TODO: cache draw radii, and make this vector a constant?
         let comparison_radii: Vec<(SolarRadius, &'static str)> = vec![
             (0.18.into(), "EZ Aquarii A"),
             (1.0.into(), "Sun"),
             (3.8.into(), "Pi\nAndromedae A"),
             (9.8.into(), "Theta Orionis C"),
+            (83.2.into(), "Avg. orbit\nMercury"),
         ];
 
+        // Draw comparison stars / orbits
         for (comparison_radius, name) in comparison_radii {
             let draw_radius =
                 calculate_draw_radius(comparison_radius, radius, subject_star_pixel_radius);
@@ -103,12 +106,45 @@ pub fn star_size_comparison_chart(ui: &mut Ui, radius: SolarRadius) {
                 // TODO: When to draw the text so that it doesn't overlap each other?
                 painter.text(
                     rect.center() + Vec2::new(draw_radius, 0.),
-                    Align2::LEFT_CENTER,
-                    format!("{}\n{:.1} {}", name, comparison_radius, SolarRadius::SYMBOL),
+                    Align2::LEFT_TOP,
+                    format!("{:.1} {}\n{}", comparison_radius, SolarRadius::SYMBOL, name),
                     FontId::new(15., FontFamily::Proportional),
                     visuals.text_color(),
                 );
             }
+        }
+
+        // Draw ruler and tick marks.
+        let major_tick_mark_height = 10.0;
+        let minor_tick_mark_height = 5.0;
+        let major_tick_mark_frequency = 5;
+
+        let ruler_range = rect.left()..=rect.right();
+
+        painter.hline(ruler_range, rect.center().y, visuals.fg_stroke);
+
+        let tick_mark_distance =
+            calculate_draw_radius(1.0.into(), radius, subject_star_pixel_radius);
+        let tick_mark_amount = (rect.center().x / tick_mark_distance).ceil() as usize;
+
+        for i in 0..tick_mark_amount {
+            let tick_mark_height = if i % major_tick_mark_frequency == 0 {
+                major_tick_mark_height
+            } else {
+                minor_tick_mark_height
+            };
+
+            // Paint 2 tick marks mirrored along the stars center.
+            painter.vline(
+                rect.center().x - i as f32 * tick_mark_distance,
+                (rect.center().y - tick_mark_height)..=rect.center().y,
+                visuals.fg_stroke,
+            );
+            painter.vline(
+                rect.center().x + i as f32 * tick_mark_distance,
+                (rect.center().y - tick_mark_height)..=rect.center().y,
+                visuals.fg_stroke,
+            );
         }
     }
 }
