@@ -3,11 +3,9 @@
 
 mod widgets;
 
-use crate::egui::plot::Plot;
 use crate::egui::Color32;
-use crate::widgets::{color_click_to_copy, label_click_to_copy};
-use eframe::egui::{Button, Context, CursorIcon, Pos2, Sense, Stroke, Ui, Vec2, Visuals, Widget};
-use eframe::epaint::CircleShape;
+use crate::widgets::{color_click_to_copy, label_click_to_copy, star_size_comparison_chart};
+use eframe::egui::{Context, Ui, Visuals};
 use eframe::{egui, Frame};
 use worldsmith_lib::units::{Kelvin, SolarDensity, SolarLuminosity, SolarMass, SolarRadius, Unit};
 use worldsmith_lib::MainSequenceStar;
@@ -110,6 +108,12 @@ impl eframe::App for WorldSmith {
                     ui.label("Color");
                     color_click_to_copy(ui, color);
                 });
+
+            star_size_comparison_chart(ui, star.radius);
+
+            // todo: add a habitable zone comparison chart,
+            //       showing where the orbits of the planets in the solar system are relative to
+            //       the "habitable" zone of this star. Including how long the year lengths would be.
         });
     }
 }

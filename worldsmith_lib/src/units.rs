@@ -21,7 +21,7 @@ impl Unit for SolarMass {
     const NAME: &'static str = "solar mass";
 }
 
-#[derive(Copy, Clone, Display)]
+#[derive(Copy, Clone, Display, From, Into)]
 pub struct SolarRadius(f32);
 
 impl SolarRadius {
