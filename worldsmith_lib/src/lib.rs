@@ -30,6 +30,7 @@ impl MainSequenceStar {
         let temperature = calculate_stellar_temperature(radius, luminosity);
 
         let class = MainSequenceStellarClass::calculate(temperature);
+        let color = class.color();
 
         MainSequenceStar {
             class,
@@ -40,7 +41,7 @@ impl MainSequenceStar {
             max_age_gigayears: maximum_age,
             temperature,
             // todo: calculate the color of the star.
-            color: ColorRgb::new(100, 200, 255),
+            color,
         }
     }
 }
@@ -75,6 +76,19 @@ impl MainSequenceStellarClass {
             spectral_class,
             // TODO (Wybe 2022-07-03): Calculate subdivision
             subdivision,
+        }
+    }
+
+    /// TODO: interpolate colors?
+    pub fn color(&self) -> ColorRgb {
+        match self.spectral_class {
+            SpectralClass::M => ColorRgb::new(255, 204, 111),
+            SpectralClass::K => ColorRgb::new(255, 210, 161),
+            SpectralClass::G => ColorRgb::new(255, 244, 234),
+            SpectralClass::F => ColorRgb::new(248, 247, 255),
+            SpectralClass::A => ColorRgb::new(202, 215, 255),
+            SpectralClass::B => ColorRgb::new(170, 191, 255),
+            SpectralClass::O => ColorRgb::new(155, 176, 255),
         }
     }
 }
